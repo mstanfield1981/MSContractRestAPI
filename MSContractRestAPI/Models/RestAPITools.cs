@@ -162,14 +162,11 @@ namespace MSContractRestAPI.Models
         }
         private ContractUpdateResponse validateUpdate(NpgsqlDataReader reader, int contractId)
         {
-
             ContractUpdateResponse response = new ContractUpdateResponse();
 
             if (reader.HasRows)
             {
                 response.updateSuccessful = true;
-
-
             }
             else
             {
@@ -182,7 +179,6 @@ namespace MSContractRestAPI.Models
         }
         private ContractDeleteResponse validateDelete(NpgsqlDataReader reader, int contractId)
         {
-
             ContractDeleteResponse response = new ContractDeleteResponse();
 
             if (reader.HasRows)
