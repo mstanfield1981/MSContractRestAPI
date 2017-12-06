@@ -102,11 +102,9 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Contract.cs" />
-    <Compile Include="Models\ContractDeleteResponse.cs" />
     <Compile Include="Models\ContractInsertResponse.cs" />
     <Compile Include="Models\ContractRequest.cs" />
     <Compile Include="Models\ContractResponse.cs" />
-    <Compile Include="Models\ContractUpdateResponse.cs" />
     <Compile Include="Models\RestAPITools.cs" />
     <Compile Include="Models\SQLStatements.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

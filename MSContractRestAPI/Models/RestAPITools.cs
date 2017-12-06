@@ -29,7 +29,7 @@ namespace MSContractRestAPI.Models
                 }
             }
 
-            return new ContractResponse { contracts = contracts };
+            return new ContractResponse { contracts = contracts, isSuccessful = true };
         }
         public ContractResponse findContracts(int _contractId)
         {
@@ -50,7 +50,7 @@ namespace MSContractRestAPI.Models
                 }
             }
 
-            return new ContractResponse { contracts = contracts };
+            return new ContractResponse { contracts = contracts, isSuccessful = true };
         }
         public ContractInsertResponse createContract(ContractRequest _request)
         {
@@ -83,9 +83,9 @@ namespace MSContractRestAPI.Models
             }
             return response;
         }
-        public ContractUpdateResponse updateContract(ContractRequest _request)
+        public ContractResponse updateContract(ContractRequest _request)
         {
-            ContractUpdateResponse response = new ContractUpdateResponse();
+            ContractResponse response = new ContractResponse();
 
             using (var conn = createConnection())
             {
@@ -96,9 +96,7 @@ namespace MSContractRestAPI.Models
                     using (var cmd = new NpgsqlCommand(new SQLStatements().updateContract(_request), conn))
                     using (var reader = cmd.ExecuteReader())
                     {
-                        response = validateUpdate(reader, _request.Id);
-
-                        response.originalRequest = _request;
+                        response = validateDBTransaction(reader, _request.Id);
                     }
                 }
                 catch (Exception e)
@@ -112,9 +110,9 @@ namespace MSContractRestAPI.Models
 
             return response;
         }
-        public ContractDeleteResponse deleteContract(int id)
+        public ContractResponse deleteContract(int id)
         {
-            ContractDeleteResponse response = new ContractDeleteResponse();
+            ContractResponse response = new ContractResponse();
 
             using (var conn = createConnection())
             {
@@ -124,7 +122,7 @@ namespace MSContractRestAPI.Models
                     using (var cmd = new NpgsqlCommand(new SQLStatements().deleteContract(id), conn))
                     using (var reader = cmd.ExecuteReader())
                     {
-                        response = validateDelete(reader, id);
+                        response = validateDBTransaction(reader, id);
                     }
                 }
                 catch (Exception e)
@@ -160,36 +158,17 @@ namespace MSContractRestAPI.Models
 
             return contracts;
         }
-        private ContractUpdateResponse validateUpdate(NpgsqlDataReader reader, int contractId)
+        private ContractResponse validateDBTransaction(NpgsqlDataReader reader, int contractId)
         {
-            ContractUpdateResponse response = new ContractUpdateResponse();
+            ContractResponse response = new ContractResponse();
 
             if (reader.HasRows)
             {
-                response.updateSuccessful = true;
+                response.isSuccessful = true;
             }
             else
             {
                 var resp = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                resp.Content = new StringContent(String.Format("Error updating contract. {0}", contractId));
-
-                throw new HttpResponseException(resp);
-            }
-            return response;
-        }
-        private ContractDeleteResponse validateDelete(NpgsqlDataReader reader, int contractId)
-        {
-            ContractDeleteResponse response = new ContractDeleteResponse();
-
-            if (reader.HasRows)
-            {
-                response.deleteSuccessful = true;
-                response.deleteMessage = String.Format("Contract Id {0} deleted.", contractId);
-            }
-            else
-            {
-                var resp = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                resp.Content = new StringContent(String.Format("Error updating contract. {0}", contractId));
 
                 throw new HttpResponseException(resp);
             }
